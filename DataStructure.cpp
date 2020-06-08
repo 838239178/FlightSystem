@@ -41,8 +41,8 @@ void StationTable::Insert(string start, string endd, AVLPTR data)
         it++;
     }
     if (it == headlist.end()) {
-        it = headlist.begin();
         headlist.push_front(StationHead{ start });
+        it = headlist.begin();
         it->edge.push_back(StationNode{ endd,data });
         data->head = it;
         data->node = it->edge.begin();
@@ -129,7 +129,7 @@ AVLTree  AirLineAVLTree::RightLeftRotation(AVLTree T)
         T->Right = RightRotation(T->Right);
     return LeftRotation(T);
 }
-AVLTree  AirLineAVLTree::Insert(AVLTree Key, AVLTree T)
+AVLTree  AirLineAVLTree::Insert(AVLTree Key, AVLTree& T)
 {
     if (!T) {
         T = Key;
@@ -196,7 +196,7 @@ AVLTree AirLineAVLTree::Delete(string Key, AVLTree T)
             T->StartName = temp->StartName;
             T = temp;
         }
-        free(temp);
+        delete temp;
         return NULL;
     }
 }

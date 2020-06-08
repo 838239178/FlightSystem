@@ -14,7 +14,7 @@ using namespace std;
 
 void AirLineManager::Add(string linecode, int planenum, int date, string start, string endd)
 {
-	AVLPTR key = (AVLPTR)malloc(sizeof(AirLineAVLNode));
+	AVLPTR key = new AirLineAVLNode;
 	key->Code = linecode;
 	key->StartName = start;
 
@@ -85,15 +85,17 @@ void AirLineManager::Order_save(FILE* F1, FILE* F2, FILE* F3, AVLPTR T)
 			fprintf(F2, "%s\t%d\t%s\t%d\n",
 				it->AirLineCode.c_str(), it->PlaneNum, it->Name.c_str(), it->TicketsNum);
 		}
-		string name = S->WatingQueue.front().Name;
-		while (1) {
-			Customer top = S->WatingQueue.front();
-			S->WatingQueue.pop();
-			S->WatingQueue.push(top);
-			fprintf(F3, "%s\t%d\t%s\t%d\n",
-				top.AirLineCode.c_str(), top.PlaneNum, top.Name.c_str(), top.TicketsNum);
-			if (S->WatingQueue.front().Name == name)
-				break;
+		if (!S->WatingQueue.empty()) {
+			string name = S->WatingQueue.front().Name;
+			while (1) {
+				Customer top = S->WatingQueue.front();
+				S->WatingQueue.pop();
+				S->WatingQueue.push(top);
+				fprintf(F3, "%s\t%d\t%s\t%d\n",
+					top.AirLineCode.c_str(), top.PlaneNum, top.Name.c_str(), top.TicketsNum);
+				if (S->WatingQueue.front().Name == name)
+					break;
+			}
 		}
 		Order_save(F1, F2, F3, T->Left);
 		Order_save(F1, F2, F3, T->Right);
@@ -101,15 +103,15 @@ void AirLineManager::Order_save(FILE* F1, FILE* F2, FILE* F3, AVLPTR T)
 }
 void AirLineManager::Save(int date)
 {
-	char s1[20];
-	itoa(date, s1, 8);
-	strcat(s1, "航班信息.txt");
-	char s2[20];
-	itoa(date, s2, 8);
-	strcat(s2, "客户信息.txt");
-	char s3[20];
-	itoa(date, s3, 8);
-	strcat(s3, "候补信息.txt");
+	char s1[25];
+	sprintf(s1, "%d", date);
+	strcat(s1, "AirLine.txt");
+	char s2[25];
+	sprintf(s2, "%d", date);
+	strcat(s2, "Customer.txt");
+	char s3[25];
+	sprintf(s3, "%d", date);
+	strcat(s3, "Backup.txt");
 	FILE* F1 = fopen(s1, "w");
 	FILE* F2 = fopen(s2, "w");
 	FILE* F3 = fopen(s3, "w");
@@ -120,9 +122,9 @@ void AirLineManager::Save(int date)
 }
 void AirLineManager::Load(string date)
 {
-	string s1 = date + "航班信息.txt";
-	string s2 = date + "客户信息.txt";
-	string s3 = date + "候补信息.txt";
+	string s1 = date + "鑸彮淇℃伅.txt";
+	string s2 = date + "瀹㈡埛淇℃伅.txt";
+	string s3 = date + "鍊欒ˉ淇℃伅.txt";
 	FILE* F1 = fopen(s1.c_str(), "r");
 	FILE* F2 = fopen(s2.c_str(), "r");
 	FILE* F3 = fopen(s3.c_str(), "r");
@@ -131,23 +133,60 @@ void AirLineManager::Load(string date)
 	string a, b;
 	while (1) {
 		fscanf(F1, "%s%d%d%s%s", e[0], &i[0], &i[1], e[1], e[2]);
+		if (feof(F1)) break;
 		a = e[1];
 		b = e[2];
 		Add(e[0], i[0], i[1], a, b);
-		if (feof(F1)) break;
 	}
+	fclose(F1);
 	while (1) {
 		fscanf(F2, "%s%d%s%d", e[0], &i[0], e[1], &i[1]);
+		if (feof(F2)) break;
 		a = e[0];
 		b = e[1];
 		AVLPTR T = AirLineData.FindByCode(a, AirLineData.root);
 		T->node->CustomerList.push_back(Customer{ b,a,i[1],i[0] });
 	}
+	fclose(F2);
 	while (1) {
 		fscanf(F3, "%s%d%s%d", e[0], &i[0], e[1], &i[1]);
+		if (feof(F3) )break;
 		a = e[0];
 		b = e[1];
 		AVLPTR T = AirLineData.FindByCode(a, AirLineData.root);
 		T->node->WatingQueue.push(Customer{ b,a,i[1],i[0] });
 	}
+	fclose(F3);
+}
+void AirLineManager::SaveBookResult(const AVLPTR data, string name)
+{
+	FILE* F = fopen("璁㈠崟璁板綍.txt", "a");
+	fprintf(F, "%s\t%s\t%d\t%s\t%s\t%d\n", name, data->Code.c_str(), data->PlaneNumber, data->StartName, data->EndName, data->FlightDate);
+	fclose(F);
+}
+Customer AirLineManager::FindBackUp(STATIONNODEPTR node, int tickets)
+{
+	Customer res(0, 0, 0, 0);
+	if (node->WatingQueue.empty())
+		return res;
+	string name = node->WatingQueue.front().Name;
+	
+	if (node->WatingQueue.front().TicketsNum <= tickets) {
+		res = node->WatingQueue.front();
+		node->WatingQueue.pop();
+		return res;
+	}
+	while (1) {
+		Customer temp = node->WatingQueue.front();
+		node->WatingQueue.pop();		
+		if (temp.TicketsNum <= tickets) {
+			res = temp;
+			tickets = -1;
+		}
+		else
+			node->WatingQueue.push(temp);
+		if (node->WatingQueue.front().Name == name)
+			break;
+	}
+	return res;
 }

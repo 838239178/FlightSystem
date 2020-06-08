@@ -2,6 +2,16 @@
 struct AirLineAVLNode;
 typedef AirLineAVLNode* AVLPTR;
 typedef AVLPTR AVLTree;
+/*二维向量*/
+typedef struct Position
+{
+    int x;
+    int y;
+
+    Position operator + (const Position& a) {
+        return Position{ x + a.x, y + a.y };
+    }
+}Ve2;
 /*客户信息*/
 typedef struct Customer
 {
@@ -66,9 +76,11 @@ typedef struct AirLineAVLNode
     STATIONNODEPTR  node;
     STATIONHEADPTR  head;
 
-    AirLineAVLNode() {
+    AirLineAVLNode():FlightDate(),PlaneNumber(){
         Left = Right = NULL;
         Height = 1;
+        RemainTickets = 50;
+        Code = EndName = StartName = "";
     }
 }AirLineAVLNode;
 /*AVL类*/
@@ -85,7 +97,7 @@ public:
     AVLTree RightRotation(AVLTree T);
     AVLTree LeftRightRotation(AVLTree T);
     AVLTree RightLeftRotation(AVLTree T);
-    AVLTree Insert(AVLTree Key, AVLTree T);
+    AVLTree Insert(AVLTree Key, AVLTree& T);
     AVLTree Delete(string Key, AVLTree T);
     AVLTree FindByCode(string key, AVLTree T);
     void ClearByDate(int date);

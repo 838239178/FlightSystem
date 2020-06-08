@@ -6,7 +6,7 @@ private:
 	AirLineAVLTree AirLineData;
 	StationTable StationData;
 	void SaveBookResult(const AVLPTR data, string name);
-	Customer FindBackUp(STATIONNODEPTR node);
+	Customer FindBackUp(STATIONNODEPTR node, int tickets);
 	void Order_save(FILE* F1, FILE* F2, FILE* F3, AVLPTR T);
 public:
 	void Add(string linecode, int planenum, int date, string start, string end);
