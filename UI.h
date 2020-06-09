@@ -32,5 +32,6 @@ public:
 	Ve2 p;
 	Ve2 size;
 	void Show(Ve2 pos);
+	void Reset();
 	void operator += (const string& s) { txt.push_back(s); }
 };

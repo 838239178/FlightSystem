@@ -36,10 +36,11 @@ void AirLineManager::Remove(int date)
 {
 	AirLineData.ClearByDate(date);
 }
-const AVLPTR AirLineManager::SearchByStation(string start, string endd)
+const vector<AVLPTR> AirLineManager::SearchByStation(string start, string endd)
 {
-	STATIONNODEPTR res = StationData.Find(start, endd);
-	return res->AirLineData;
+	vector<AVLPTR> ptrs;
+	StationData.Find(start, endd, ptrs);
+	return ptrs;
 }
 const AVLPTR AirLineManager::AddCustomer(string linecode, string name, int& num)
 {
@@ -103,8 +104,9 @@ void AirLineManager::Order_save(FILE* F1, FILE* F2, FILE* F3, AVLPTR T)
 }
 void AirLineManager::Save(int date)
 {
-	char s1[25];
+	char s1[25];;
 	sprintf(s1, "%d", date);
+	this->Version = s1;
 	strcat(s1, "AirLine.txt");
 	char s2[25];
 	sprintf(s2, "%d", date);
@@ -122,14 +124,15 @@ void AirLineManager::Save(int date)
 }
 void AirLineManager::Load(string date)
 {
-	string s1 = date + "航班信息.txt";
-	string s2 = date + "客户信息.txt";
-	string s3 = date + "候补信息.txt";
+	this->Version = date;
+	string s1 = date + "AirLine.txt";
+	string s2 = date + "Customer.txt";
+	string s3 = date + "Backup.txt";
 	FILE* F1 = fopen(s1.c_str(), "r");
 	FILE* F2 = fopen(s2.c_str(), "r");
 	FILE* F3 = fopen(s3.c_str(), "r");
 	char e[3][10];
-	char i[5];
+	int i[5];
 	string a, b;
 	while (1) {
 		fscanf(F1, "%s%d%d%s%s", e[0], &i[0], &i[1], e[1], e[2]);
@@ -160,7 +163,7 @@ void AirLineManager::Load(string date)
 }
 void AirLineManager::SaveBookResult(const AVLPTR data, string name)
 {
-	FILE* F = fopen("订单记录.txt", "a");
+	FILE* F = fopen("BookRecord.txt", "a");
 	fprintf(F, "%s\t%s\t%d\t%s\t%s\t%d\n", name, data->Code.c_str(), data->PlaneNumber, data->StartName, data->EndName, data->FlightDate);
 	fclose(F);
 }

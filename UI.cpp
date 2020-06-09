@@ -50,11 +50,19 @@ void Dialog::Show(Ve2 pos)
 	outtextxy(pos.x+w/15, pos.y+h/3, label.c_str()); 
 }
 //Text
+void Text::Reset()
+{
+	txt.clear();
+	p.x = p.y = 0;
+	size.x = size.y = 0;
+}
 void Text::Show(Ve2 pos)
 {
 	p = pos;
+	settextcolor(GREEN);
+	settextstyle(24, 0, "ËÎÌו", 0, 0, 1000, 0, 0, 0);
 	for (int i = 0; i < txt.size(); i++) {
 		outtextxy(pos.x, pos.y, txt[i].c_str());
-		pos.y += 10;
+		pos.y += 40;
 	}
 }

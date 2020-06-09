@@ -56,7 +56,8 @@ class StationTable
 public:
 	list<StationHead> headlist;
 
-	STATIONNODEPTR Find(string start, string end);
+    AVLPTR Find(string start, string end);
+    bool Find(string start, string end, vector<AVLPTR>& ptrs);
 	void Insert(string start, string end, AVLPTR data);
 	bool Remove(string start, string end);
 	bool Remove(STATIONHEADPTR start, STATIONNODEPTR end);
