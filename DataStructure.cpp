@@ -11,7 +11,7 @@
 using namespace std;
 #include "DataStructure.h"
 /*аз╫с╠М*/
-STATIONNODEPTR StationTable::Find(string start, string endd)
+AVLPTR StationTable::Find(string start, string endd)
 {
     STATIONNODEPTR sta;
     auto it = headlist.begin();
@@ -20,13 +20,35 @@ STATIONNODEPTR StationTable::Find(string start, string endd)
             sta = it->edge.begin();
             while (sta != it->edge.end()) {
                 if (sta->EndName == endd)
-                    return sta;
+                    return sta->AirLineData;
                 sta++;
             }
+            break;
         }
         it++;
     }
-    return sta;
+    return NULL;
+}
+bool StationTable::Find(string start, string endd, vector<AVLPTR>& ptrs)
+{
+    STATIONNODEPTR sta;
+    auto it = headlist.begin();
+    while (it != headlist.end()) {
+        if (it->StartName == start) {
+            sta = it->edge.begin();
+            while (sta != it->edge.end()) {
+                if (sta->EndName == endd)
+                    ptrs.push_back(sta->AirLineData);
+                sta++;
+            }
+            break;
+        }
+        it++;
+    }
+    if (ptrs.empty())
+        return false;
+    else
+        return true;
 }
 void StationTable::Insert(string start, string endd, AVLPTR data)
 {
@@ -197,6 +219,7 @@ AVLTree AirLineAVLTree::Delete(string Key, AVLTree T)
             T = temp;
         }
         delete temp;
+        T = NULL;
         return NULL;
     }
 }
