@@ -18,13 +18,13 @@ typedef struct Customer
 	string Name;
 	string AirLineCode;
 	int TicketsNum;
-	int PlaneNum;
+	int SeatNo;
 
-	Customer(string n, string a, int num, int code) {
+	Customer(string n, string a, int num, int no) {
 		Name = n;
 		AirLineCode = a;
 		TicketsNum = num;
-		PlaneNum = code;
+		SeatNo = no;
 	}
 }Customer;
 /*жу╣Ц╫А╣Ц*/
@@ -69,7 +69,7 @@ typedef struct AirLineAVLNode
     string EndName;
     string StartName;
     int FlightDate;
-    int PlaneNumber;
+    int PlaneNo;
     int RemainTickets;
     int Height;
     AirLineAVLNode* Left;
@@ -77,7 +77,7 @@ typedef struct AirLineAVLNode
     STATIONNODEPTR  node;
     STATIONHEADPTR  head;
 
-    AirLineAVLNode():FlightDate(),PlaneNumber(){
+    AirLineAVLNode():FlightDate(),PlaneNo(){
         Left = Right = NULL;
         Height = 1;
         RemainTickets = 50;

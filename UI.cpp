@@ -30,7 +30,24 @@ void Button::Show(Ve2 pos)
 	putimage(pos.x, pos.y, &ground);
 	outtextxy(pos.x+w/3, pos.y+h/3, label.c_str());
 }
+void Button::Select(MOUSEMSG m)
+{
+	Ve2 s = p;
+	Ve2 e = p + size;
+	if (m.x > s.x&& m.y > s.y
+		&& m.x < e.x && m.y < e.y) {
+		selected = true;
+	}
+	else {
+		selected = false;
+	}
+}
 //Dialog
+void Dialog::AddButton(Button* btn1, Button* btn2)
+{
+	btn_1 = btn1;
+	btn_2 = btn2;
+}
 void Dialog::SetImage(string filename)
 {
 	string s = "pic\\" + filename;
@@ -48,6 +65,18 @@ void Dialog::Show(Ve2 pos)
 	putimage(pos.x, pos.y, &ground);
 	outtextxy(pos.x+w/15, pos.y+h/15, title.c_str());
 	outtextxy(pos.x+w/15, pos.y+h/3, label.c_str()); 
+}
+void Dialog::Select(MOUSEMSG m)
+{
+	Ve2 s = p;
+	Ve2 e = p + size;
+	if (m.x > s.x&& m.y > s.y
+		&& m.x < e.x && m.y < e.y) {
+		selected = true;
+	}
+	else {
+		selected = false;
+	}
 }
 //Text
 void Text::Reset()

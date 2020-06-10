@@ -212,7 +212,7 @@ AVLTree AirLineAVLTree::Delete(string Key, AVLTree T)
             T->Code = temp->Code;
             T->FlightDate = temp->FlightDate;
             T->Height = temp->Height;
-            T->PlaneNumber = temp->PlaneNumber;
+            T->PlaneNo = temp->PlaneNo;
             T->RemainTickets = temp->RemainTickets;
             T->EndName = temp->EndName;
             T->StartName = temp->StartName;
