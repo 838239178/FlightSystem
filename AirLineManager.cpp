@@ -95,32 +95,6 @@ bool AirLineManager::RemoveCustomer(string linecode, string name)
 	else
 		return false;
 }
-void AirLineManager::Order_save(FILE* F1, FILE* F2, FILE* F3, AVLPTR T)
-{
-	if (T) {
-		fprintf(F1, "%s\t%d\t%d\t%s\t%s\t%d\n",
-			T->Code.c_str(), T->PlaneNo, T->FlightDate, T->StartName.c_str(), T->EndName.c_str(), T->RemainTickets);
-		STATIONNODEPTR S = T->node;
-		for (auto it = S->CustomerList.begin(); it != S->CustomerList.end(); it++) {
-			fprintf(F2, "%s\t%d\t%s\t%d\n",
-				it->AirLineCode.c_str(), it->SeatNo, it->Name.c_str(), it->TicketsNum);
-		}
-		if (!S->WatingQueue.empty()) {
-			string name = S->WatingQueue.front().Name;
-			while (1) {
-				Customer top = S->WatingQueue.front();
-				S->WatingQueue.pop();
-				S->WatingQueue.push(top);
-				fprintf(F3, "%s\t%d\t%s\t%d\n",
-					top.AirLineCode.c_str(), top.SeatNo, top.Name.c_str(), top.TicketsNum);
-				if (S->WatingQueue.front().Name == name)
-					break;
-			}
-		}
-		Order_save(F1, F2, F3, T->Left);
-		Order_save(F1, F2, F3, T->Right);
-	}
-}
 void AirLineManager::Save(int date)
 {
 	char s1[25];;
@@ -136,12 +110,44 @@ void AirLineManager::Save(int date)
 	FILE* F1 = fopen(s1, "w");
 	FILE* F2 = fopen(s2, "w");
 	FILE* F3 = fopen(s3, "w");
-	Order_save(F1, F1, F3, AirLineData.root);
+	stack<AVLPTR> s;
+	AVLPTR T = AirLineData.root;
+	while (!s.empty() || T) {
+		while (T)
+		{
+			fprintf(F1, "%s\t%d\t%d\t%s\t%s\t%d\n",
+				T->Code.c_str(), T->PlaneNo, T->FlightDate, T->StartName.c_str(), T->EndName.c_str(), T->RemainTickets);
+			STATIONNODEPTR S = T->node;
+			for (auto it = S->CustomerList.begin(); it != S->CustomerList.end(); it++) {
+				fprintf(F2, "%s\t%d\t%s\t%d\n",
+					it->AirLineCode.c_str(), it->SeatNo, it->Name.c_str(), it->TicketsNum);
+			}
+			if (!S->WatingQueue.empty()) {
+				string name = S->WatingQueue.front().Name;
+				while (1) {
+					Customer top = S->WatingQueue.front();
+					S->WatingQueue.pop();
+					S->WatingQueue.push(top);
+					fprintf(F3, "%s\t%d\t%s\t%d\n",
+						top.AirLineCode.c_str(), top.SeatNo, top.Name.c_str(), top.TicketsNum);
+					if (S->WatingQueue.front().Name == name)
+						break;
+				}
+			}
+			s.push(T);
+			T = T->Left;
+		}
+		if (!s.empty()) {
+			T = s.top();
+			s.pop();
+			T = T->Right;
+		}
+	}
 	fclose(F1);
 	fclose(F2);
 	fclose(F3);
 }
-void AirLineManager::Load(string date)
+bool AirLineManager::Load(string date)
 {
 	this->Version = date;
 	string s1 = date + "AirLine.txt";
@@ -150,20 +156,22 @@ void AirLineManager::Load(string date)
 	FILE* F1 = fopen(s1.c_str(), "r");
 	FILE* F2 = fopen(s2.c_str(), "r");
 	FILE* F3 = fopen(s3.c_str(), "r");
-	char e[4][10];
-	int i[5];
+	char e[4][10] = {'\0'};
+	int i[5] = { 0 };
+	int flag = 0;
 	string a, b;
+	if (!(F1 && F2 && F3)) return false;
 	while (1) {
-		if (feof(F1)) break;
-		fscanf(F1, "%s%d%d%s%s%d", e[0], &i[0], &i[1], e[1], e[2],&i[2]);
+		flag = fscanf(F1, "%s %d %d %s %s %d", e[0], &i[0], &i[1], e[1], e[2], &i[2]);
+		if (flag == -1) break;
 		a = e[1];
 		b = e[2];
 		Add(e[0], i[0], i[1], a, b, i[2]);
 	}
 	fclose(F1);
 	while (1) {
-		if (feof(F2)) break;
-		fscanf(F2, "%s%d%s%d", e[0], &i[0], e[1], &i[1]);
+		flag = fscanf(F2, "%s %d %s %d", e[0], &i[0], e[1], &i[1]);
+		if (flag == -1) break;
 		a = e[0];
 		b = e[1];
 		AVLPTR T = AirLineData.FindByCode(a, AirLineData.root);
@@ -171,19 +179,20 @@ void AirLineManager::Load(string date)
 	}
 	fclose(F2);
 	while (1) {
-		if (feof(F3) )break;
-		fscanf(F3, "%s%d%s%d", e[0], &i[0], e[1], &i[1]);
+		flag = fscanf(F3, "%s %d %s %d", e[0], &i[0], e[1], &i[1]);
+		if (flag == -1)break;
 		a = e[0];
 		b = e[1];
 		AVLPTR T = AirLineData.FindByCode(a, AirLineData.root);
 		T->node->WatingQueue.push(Customer{ b,a,i[1],i[0] });
 	}
 	fclose(F3);
+	return true;
 }
 void AirLineManager::SaveBookResult(const AVLPTR data, string name)
 {
 	FILE* F = fopen("BookRecord.txt", "a");
-	fprintf(F, "%d\t%s\t%s\t%d\t%s\t%s\t%d\n", nowDate, name, data->Code.c_str(), data->PlaneNo, data->StartName, data->EndName, data->FlightDate);
+	fprintf(F, "%s\t%s\t%s\t%d\t%s\t%s\t%d\n", Version.c_str(), name, data->Code.c_str(), data->PlaneNo, data->StartName.c_str(), data->EndName.c_str(), data->FlightDate);
 	fclose(F);
 }
 Customer AirLineManager::FindBackUp(STATIONNODEPTR node, int tickets)

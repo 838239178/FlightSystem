@@ -1,4 +1,5 @@
-﻿#include <iostream>
+﻿/*line: 1183*/
+#include <iostream>
 #include <string>
 #include <vector>
 #include <stack>
@@ -43,8 +44,6 @@ AirLineManager SysManager;
 Timer CLOCK;
 IMAGE background;
 Button btn[8];
-//Button YES;
-//Button NO;
 Button Exit;
 Button Login;
 Dialog Log;
@@ -67,9 +66,9 @@ void OnLoad()
 {
 	initgraph(800, 600);
 	setbkmode(TRANSPARENT);
-	SysManager.SetDate(CLOCK.GetTime());
 	Tag = NORMAL;
 	UserName = "none";
+	CLOCK.GetTime();
 	BeginBatchDraw();
 	//
 	loadimage(&background, "pic\\background.png");
@@ -82,12 +81,13 @@ void OnLoad()
 	"保存",//4
 	"加载",//5
 	"清除",//6
+	"加载最近一次", //7
 	};
 	Login.label = "登录";
 	Login.SetImage("btn.png");
 	Exit.label = "退出";
 	Exit.SetImage("btn.png");
-	for (int i = 0; i < 7; i++) {
+	for (int i = 0; i < 8; i++) {
 		btn[i].label = s[i];
 		btn[i].SetImage("btn.png");
 	}
@@ -105,7 +105,6 @@ void OnLoad()
 }
 void OnExit()
 {
-	//Save();
 	EndBatchDraw();
 	closegraph();
 }
@@ -114,7 +113,7 @@ void Control()
 	if (MouseHit()) {
 		MOUSEMSG m = GetMouseMsg();
 		if (m.mkLButton == true) {
-			for (int i = 0; i < 7; i++) {
+			for (int i = 0; i < 8; i++) {
 				if (btn[i].Click != NULL)
 					btn[i].Click(btn[i], m);
 			}
@@ -149,6 +148,7 @@ void ShowMenu()
 }
 bool BookTicket()
 {
+	if (SysManager.GetVersion() == "not loaded") return false;
 	if (UserName == "none") return false;
 	Result.Reset();
 	Result.p = Ve2{ 240,90 };
@@ -204,6 +204,7 @@ bool BookTicket()
 }
 bool RefundTiket()
 {
+	if (SysManager.GetVersion() == "not loaded") return false;
 	if (UserName == "none") return false;
 	char input[100];
 	InputBox(input, 100, "航班号", "输入航班号退票:");
@@ -213,6 +214,7 @@ bool RefundTiket()
 }
 bool Search()
 {	
+	if (SysManager.GetVersion() == "not loaded") return false;
 	Result.Reset();	
 	Result.p = Ve2{ 240,90 };
 	Result += "航班号    飞机号  起飞时间    余票";
@@ -237,6 +239,7 @@ bool Search()
 }
 bool Write()
 {
+	if (SysManager.GetVersion() == "not loaded") return false;
 	char input[100] = { '\0' };
 	InputBox(input, 100,  "航班号  飞机号  日期  起点  终点", "按格式输入航班信息:");
 	if (input[0] == '\0')
@@ -269,6 +272,7 @@ bool Load()
 }
 bool Clear()
 {
+	if (SysManager.GetVersion() == "not loaded") return false;
 	int date;
 	char s[10] = { '\0' };
 	InputBox(s, 10, "年月日(EX:20200605)", "请输入日期:",0,100,100);
@@ -305,6 +309,8 @@ void btn0_Click(Button& sender, MOUSEMSG m)
 			string s = "订票异常,";
 			if (UserName == "none")
 				s += "请检查是否登录";
+			else if (SysManager.GetVersion() == "not loaded")
+				s += "未载入数据";
 			else
 				s += "没有该航班";
 			showdialog(Ve2{ 300,200 }, "提示", s);
@@ -326,6 +332,8 @@ void btn1_Click(Button& sender, MOUSEMSG m)
 			string s = "退票异常,";
 			if (UserName == "none")
 				s += "请检查是否登录";
+			else if (SysManager.GetVersion() == "not loaded")
+				s += "当前未加载数据";
 			else
 				s += "您没有预定该航班";
 			showdialog(Ve2{ 300,200 }, "提示", s);
@@ -340,7 +348,9 @@ void btn4_Click(Button& sender, MOUSEMSG m)
 		&& m.x < e.x && m.y < e.y) {
 		Save();
 		showdialog(Ve2{ 300,200 }, "提示:", "保存成功");
+		Tag = NORMAL;
 	}
+	
 }
 void btn3_Click(Button& sender, MOUSEMSG m)
 {
@@ -350,8 +360,15 @@ void btn3_Click(Button& sender, MOUSEMSG m)
 		&& m.x < e.x && m.y < e.y) {
 		if(Write())
 			showdialog(Ve2{ 300,200 }, "提示:", "录入成功");
-		else
-			showdialog(Ve2{ 300,200 }, "提示:", "录入失败");
+		else {
+			string s;
+			if (SysManager.GetVersion() == "not loaded")
+				s += "当前未加载数据";
+			else
+				s += "输入错误";
+			showdialog(Ve2{ 300,200 }, "提示:", s);
+		}
+		Tag = NORMAL;
 	}
 }
 void btn5_Click(Button& sender, MOUSEMSG m)
@@ -364,6 +381,7 @@ void btn5_Click(Button& sender, MOUSEMSG m)
 			showdialog(Ve2{ 300,200 }, "提示:", "加载成功");
 		else
 			showdialog(Ve2{ 300,200 }, "提示:", "加载失败");
+		Tag = NORMAL;
 	}
 }
 void btn6_Click(Button& sender, MOUSEMSG m)
@@ -374,8 +392,15 @@ void btn6_Click(Button& sender, MOUSEMSG m)
 		&& m.x < e.x && m.y < e.y) {
 		if (Clear())
 			showdialog(Ve2{ 300,200 }, "提示:", "清除成功");
-		else
-			showdialog(Ve2{ 300,200 }, "提示:", "清除失败");
+		else {
+			string s;
+			if (SysManager.GetVersion() == "not loaded")
+				s = "未载入数据";
+			else
+				s = "输入错误";
+			showdialog(Ve2{ 300,200 }, "提示:", s);
+		}
+		Tag = NORMAL;
 	}
 }
 void btn2_Click(Button& sender, MOUSEMSG m)
@@ -384,8 +409,14 @@ void btn2_Click(Button& sender, MOUSEMSG m)
 	Ve2 e = sender.p + sender.size;
 	if (m.x > s.x&& m.y > s.y
 		&& m.x < e.x && m.y < e.y) {
-		if (!Search())
-			showdialog(Ve2{ 300,200 }, "提示:", "暂时没有该航班");
+		if (!Search()) {
+			string s;
+			if (SysManager.GetVersion() == "not loaded")
+				s += "当前未加载数据";
+			else
+				s += "暂时没有该航班";
+			showdialog(Ve2{ 300,200 }, "提示:", s);
+		}
 		else
 			Tag = RESULT;
 	}
@@ -398,8 +429,10 @@ void login_Click(Button& sender, MOUSEMSG m)
 		&& m.x < e.x && m.y < e.y) {
 		if (LogIN())
 			showdialog(Ve2{ 300,200 }, "提示:", "登陆成功");
-		else
+		else {
 			showdialog(Ve2{ 300,200 }, "提示:", "登陆失败");
+		}
+		Tag = NORMAL;
 	}
 }
 void exit_Click(Button& sender, MOUSEMSG m)
