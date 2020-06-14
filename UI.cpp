@@ -26,11 +26,32 @@ void Button::Show(Ve2 pos)
 	int w = ground.getwidth();
 	int h = ground.getheight();
 	settextcolor(BLACK);
-	settextstyle(24, 0, "黑体",0,0,100,0,0,0);
+	settextstyle(24, 12, "黑体",0,0,100,0,0,0);
 	putimage(pos.x, pos.y, &ground);
-	outtextxy(pos.x+w/3, pos.y+h/3, label.c_str());
+	//根据字符串长度，居中输出
+	Ve2 temp;
+	temp.x = (w - label.length() * 12) / 2;
+	temp.y = (h - 24) / 2;
+	outtextxy(pos.x+temp.x, pos.y+temp.y, label.c_str());
+}
+void Button::Select(MOUSEMSG m)
+{
+	Ve2 s = p;
+	Ve2 e = p + size;
+	if (m.x > s.x&& m.y > s.y
+		&& m.x < e.x && m.y < e.y) {
+		selected = true;
+	}
+	else {
+		selected = false;
+	}
 }
 //Dialog
+void Dialog::AddButton(Button* btn1, Button* btn2)
+{
+	btn_1 = btn1;
+	btn_2 = btn2;
+}
 void Dialog::SetImage(string filename)
 {
 	string s = "pic\\" + filename;
@@ -47,7 +68,29 @@ void Dialog::Show(Ve2 pos)
 	settextstyle(24, 0, "黑体", 0, 0, 100, 0, 0, 0);
 	putimage(pos.x, pos.y, &ground);
 	outtextxy(pos.x+w/15, pos.y+h/15, title.c_str());
-	outtextxy(pos.x+w/15, pos.y+h/3, label.c_str()); 
+	string temp;
+	int i = 0;
+	//分割字符串输出
+	do {
+		if (i < label.length())
+			temp = label.substr(i, 24);
+		else
+			temp = "";
+		i += 24;
+		outtextxy(pos.x+w/15, pos.y+h/3+i, temp.c_str());
+	} while (temp.length());
+}
+void Dialog::Select(MOUSEMSG m)
+{
+	Ve2 s = p;
+	Ve2 e = p + size;
+	if (m.x > s.x&& m.y > s.y
+		&& m.x < e.x && m.y < e.y) {
+		selected = true;
+	}
+	else {
+		selected = false;
+	}
 }
 //Text
 void Text::Reset()
@@ -60,9 +103,21 @@ void Text::Show(Ve2 pos)
 {
 	p = pos;
 	settextcolor(GREEN);
-	settextstyle(24, 0, "宋体", 0, 0, 1000, 0, 0, 0);
-	for (int i = 0; i < txt.size(); i++) {
+	settextstyle(24, 12, "宋体", 0, 0, 1000, 0, 0, 0);
+	for (int i = maxline-defaultline; i < txt.size() && i< maxline; i++) {
 		outtextxy(pos.x, pos.y, txt[i].c_str());
 		pos.y += 40;
 	}
+}
+void Text::SetLine(int n) {
+	maxline = n;
+	defaultline = n;
+}
+void Text::NextLine() {
+	if (maxline < txt.size())
+		maxline++;
+}
+void Text::PreLine() {
+	if (maxline > defaultline)
+		maxline--;
 }

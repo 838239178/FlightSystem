@@ -100,22 +100,37 @@ bool StationTable::Remove(STATIONHEADPTR start, STATIONNODEPTR end)
 }
 
 /*AVL树*/
+void AirLineAVLTree::Deliver(AVLTree a, AVLTree b)
+{
+    //把a对应的站点的指针指向b
+    a->node->AirLineData = b;
+    //a的其他值覆盖b
+    b->Code = a->Code;
+    b->EndName = a->EndName;
+    b->StartName = a->StartName;
+    b->head = a->head;
+    b->node = a->node;
+    b->Height = a->Height;
+    b->PlaneNo = a->PlaneNo;
+    b->RemainTickets = a->RemainTickets;
+    b->FlightDate = a->FlightDate;
+}
 int AirLineAVLTree::GetHeight(AVLTree A) {
     if (A == NULL)
         return 0;
     return A->Height;
 }
-AVLTree  AirLineAVLTree::FindMax(AVLTree T)
+AVLTree  AirLineAVLTree::FindMaxParent(AVLTree T)
 {
-    while (T && T->Right)
+    while (T && T->Right && T->Right->Right)
     {
         T = T->Right;
     }
     return T;
 }
-AVLTree  AirLineAVLTree::FindMin(AVLTree T)
+AVLTree  AirLineAVLTree::FindMinParent(AVLTree T)
 {
-    while (T && T->Left)
+    while (T && T->Left && T->Left->Left)
     {
         T = T->Left;
     }
@@ -205,22 +220,30 @@ AVLTree AirLineAVLTree::Delete(string Key, AVLTree T)
         return T;
     }
     else {
-        AVLTree temp = T;
-        while (temp->Left || temp->Right)
-        {
-            temp = FindMax(temp->Left);
-            T->Code = temp->Code;
-            T->FlightDate = temp->FlightDate;
-            T->Height = temp->Height;
-            T->PlaneNumber = temp->PlaneNumber;
-            T->RemainTickets = temp->RemainTickets;
-            T->EndName = temp->EndName;
-            T->StartName = temp->StartName;
-            T = temp;
+        if (T->Left && T->Right) {
+            AVLTree temp = FindMaxParent(T->Left);
+            AVLTree pre = temp->Right? temp->Right : temp;
+            Deliver(pre, T);
+            delete pre;
+            temp->Right = NULL;
         }
-        delete temp;
-        T = NULL;
-        return NULL;
+        else if (T->Left && !T->Right) {
+            Deliver(T->Left, T);
+            AVLTree d = T->Left;
+            delete d;
+            T->Left = NULL;
+        }
+        else if (!T->Left && T->Right) {
+            Deliver(T->Right, T);
+            AVLTree d = T->Right;
+            delete d;
+            T->Right = NULL;
+        }
+        else {
+            delete T;
+            T = NULL;
+        }
+        return T;
     }
 }
 AVLTree  AirLineAVLTree::FindByCode(string key, AVLTree T)
@@ -238,21 +261,33 @@ AVLTree  AirLineAVLTree::FindByCode(string key, AVLTree T)
 }
 void  AirLineAVLTree::ClearByDate(int date)
 {
-    vector<AVLPTR> keys;
-    GetPTR(root, date, keys);
-    for (int i = 0; i < keys.size(); i++)
-    {
-        auto head = keys[i]->head;
-        auto node = keys[i]->node;
-        head->edge.erase(node);
-        Delete(keys[i]->Code, root);
-    }
-}
-void  AirLineAVLTree::GetPTR(AVLTree T, int date, vector<AVLPTR>& code) {
-    if (T) {
-        if (T->FlightDate < date)
-            code.push_back(T);
-        GetPTR(T->Left, date, code);
-        GetPTR(T->Right, date, code);
+    stack<AVLPTR> s;
+    AVLPTR T = root;
+    map<AVLTree, bool> isFrist;             //判断是否第一次出现
+    /*后序遍历*/
+    while (!s.empty() || T) {
+        while (T)
+        {
+            isFrist[T] = true;
+            s.push(T);
+            T = T->Left;
+        }
+        if (!s.empty()) {
+            T = s.top();
+            if (isFrist[T]) {
+                isFrist[T] = false;
+                T = T->Right;
+            }
+            else {
+                if (T->FlightDate < date) {
+                    auto head = T->head;
+                    auto node = T->node;
+                    head->edge.erase(node);
+                    root = Delete(T->Code, root);
+                }
+                s.pop();
+                T = NULL;
+            }
+        }
     }
 }
