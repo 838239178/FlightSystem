@@ -25,11 +25,11 @@ GetTime()：计算时间
 #### 说明
 可以用于鼠标点击事件，并可自定义事件，按钮图片及文字可自定义
 #### 方法
-（*Click)(object, event): 函数指针，用于绑定自定义函数
-Seclect(object, event): 检测鼠标指针是否选取了按钮
-SetImage(path): 设置按钮的背景图
-Show(): 绘制按钮
-label: 显示于按钮上的文字
+* *Click (object, event): 函数指针，用于绑定自定义函数  
+* Seclect(object, event): 检测鼠标指针是否选取了按钮  
+* SetImage(path): 设置按钮的背景图 
+* Show(): 绘制按钮  
+* label: 显示于按钮上的文字
 ### Dialog
 #### 说明
 提示框，文本量有限
