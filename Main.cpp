@@ -48,7 +48,7 @@ Button Exit;
 Button Login;
 Button Auto;
 Dialog Log;
-Text Result;
+Text Result(6);
 string UserName;
 int Tag;
 
@@ -62,6 +62,7 @@ void btn6_Click(Button& sender, MOUSEMSG m);
 void auto_Click(Button& sender, MOUSEMSG m);
 void login_Click(Button& sender, MOUSEMSG m);
 void exit_Click(Button& sender, MOUSEMSG m);
+void result_Scroll(Text& sender, MOUSEMSG m);
 void showdialog(Ve2 p,string title, string label, int time = 1000);
 
 void OnLoad()
@@ -104,6 +105,7 @@ void OnLoad()
 	Login.Click = login_Click;
 	Exit.Click = exit_Click;
 	Auto.Click = auto_Click;
+	Result.Scroll = result_Scroll;
 	//
 	Log.SetImage("dialog.png");
 }
@@ -124,6 +126,9 @@ void Control()
 			if (Login.Click) Login.Click(Login,m);
 			if (Exit.Click) Exit.Click(Exit, m);
 			if (Auto.Click) Auto.Click(Auto, m);
+		}
+		if (m.uMsg == WM_MOUSEWHEEL) {
+			if (Result.Scroll) Result.Scroll(Result,m);
 		}
 	}	
 	FlushMouseMsgBuffer();
@@ -290,8 +295,8 @@ bool Clear()
 }
 bool LogIN()
 {
-	char input[50] = { '\0' };
-	InputBox(input, 50, "(EX:小王)", "请输入姓名:", 0, 100, 100);
+	char input[15] = { '\0' };
+	InputBox(input, 15, "(EX:小王)", "请输入姓名:", 0, 100, 100);
 	if (input[0] == '\0')
 		return false;
 	UserName = input;
@@ -326,6 +331,20 @@ void btn0_Click(Button& sender, MOUSEMSG m)
 		}
 	}
 }
+void result_Scroll(Text& sender, MOUSEMSG m)
+{
+
+	Ve2 s = sender.p;
+	Ve2 e = sender.p + sender.size;
+	if (m.x > s.x&& m.y > s.y
+		&& m.x < e.x && m.y < e.y) {
+		if (m.wheel > 0)
+			Result.PreLine();
+		else
+			Result.NextLine();
+	}
+}
+
 void btn1_Click(Button& sender, MOUSEMSG m)
 {
 	Ve2 s = sender.p;
@@ -352,6 +371,10 @@ void btn4_Click(Button& sender, MOUSEMSG m)
 	Ve2 e = sender.p + sender.size;
 	if (m.x > s.x&& m.y > s.y
 		&& m.x < e.x && m.y < e.y) {
+		if (UserName != "administrator") {
+			showdialog(Ve2{ 300,200 }, "提示:", "无权限！");
+			return;
+		}
 		Save();
 		showdialog(Ve2{ 300,200 }, "提示:", "保存成功");
 		Tag = NORMAL;
@@ -364,6 +387,10 @@ void btn3_Click(Button& sender, MOUSEMSG m)
 	Ve2 e = sender.p + sender.size;
 	if (m.x > s.x&& m.y > s.y
 		&& m.x < e.x && m.y < e.y) {
+		if (UserName != "administrator") {
+			showdialog(Ve2{ 300,200 }, "提示:", "无权限！");
+			return;
+		}
 		if(Write())
 			showdialog(Ve2{ 300,200 }, "提示:", "录入成功");
 		else {
@@ -383,6 +410,10 @@ void btn5_Click(Button& sender, MOUSEMSG m)
 	Ve2 e = sender.p + sender.size;
 	if (m.x > s.x&& m.y > s.y
 		&& m.x < e.x && m.y < e.y) {
+		if (UserName != "administrator") {
+			showdialog(Ve2{ 300,200 }, "提示:", "无权限！");
+			return;
+		}
 		if (Load())
 			showdialog(Ve2{ 300,200 }, "提示:", "加载成功");
 		else
@@ -396,6 +427,10 @@ void btn6_Click(Button& sender, MOUSEMSG m)
 	Ve2 e = sender.p + sender.size;
 	if (m.x > s.x&& m.y > s.y
 		&& m.x < e.x && m.y < e.y) {
+		if (UserName != "administrator") {
+			showdialog(Ve2{ 300,200 }, "提示:", "无权限！");
+			return;
+		}
 		if (Clear())
 			showdialog(Ve2{ 300,200 }, "提示:", "清除成功");
 		else {
@@ -456,6 +491,10 @@ void auto_Click(Button& sender, MOUSEMSG m)
 	Ve2 e = sender.p + sender.size;
 	if (m.x > s.x&& m.y > s.y
 		&& m.x < e.x && m.y < e.y) {
+		if (UserName != "administrator") {
+			showdialog(Ve2{ 300,200 }, "提示:", "无权限！");
+			return;
+		}
 		if(SysManager.AutoLoad())
 			showdialog(Ve2{ 300,200 }, "提示:", "加载成功");
 		else 

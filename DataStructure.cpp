@@ -122,7 +122,7 @@ int AirLineAVLTree::GetHeight(AVLTree A) {
 }
 AVLTree  AirLineAVLTree::FindMaxParent(AVLTree T)
 {
-    while (T && T->Right->Right)
+    while (T && T->Right && T->Right->Right)
     {
         T = T->Right;
     }
@@ -130,7 +130,7 @@ AVLTree  AirLineAVLTree::FindMaxParent(AVLTree T)
 }
 AVLTree  AirLineAVLTree::FindMinParent(AVLTree T)
 {
-    while (T && T->Left->Left)
+    while (T && T->Left && T->Left->Left)
     {
         T = T->Left;
     }
@@ -222,7 +222,7 @@ AVLTree AirLineAVLTree::Delete(string Key, AVLTree T)
     else {
         if (T->Left && T->Right) {
             AVLTree temp = FindMaxParent(T->Left);
-            AVLTree pre = temp->Right;
+            AVLTree pre = temp->Right? temp->Right : temp;
             Deliver(pre, T);
             delete pre;
             temp->Right = NULL;

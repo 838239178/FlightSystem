@@ -35,10 +35,23 @@ class Text
 {
 private:
 	vector<string> txt;
+	int maxline;
+	int defaultline;
 public:	
 	Ve2 p;
 	Ve2 size;
+	void (*Scroll)(Text&, MOUSEMSG e);
 	void Show(Ve2 pos);
 	void Reset();
-	void operator += (const string& s) { txt.push_back(s); }
+	void SetLine(int n);
+	void NextLine();
+	void PreLine();
+	Text(int line) {
+		SetLine(line);
+	}	
+	void operator += (const string& s) { 
+		txt.push_back(s); 
+		size.y = txt.size() * 64;
+		size.x = max(size.x,s.length() * 12);
+	}
 };

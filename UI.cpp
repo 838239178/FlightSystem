@@ -73,10 +73,10 @@ void Dialog::Show(Ve2 pos)
 	//分割字符串输出
 	do {
 		if (i < label.length())
-			temp = label.substr(i, 22);
+			temp = label.substr(i, 24);
 		else
 			temp = "";
-		i += 22;
+		i += 24;
 		outtextxy(pos.x+w/15, pos.y+h/3+i, temp.c_str());
 	} while (temp.length());
 }
@@ -103,9 +103,21 @@ void Text::Show(Ve2 pos)
 {
 	p = pos;
 	settextcolor(GREEN);
-	settextstyle(24, 0, "宋体", 0, 0, 1000, 0, 0, 0);
-	for (int i = 0; i < txt.size(); i++) {
+	settextstyle(24, 12, "宋体", 0, 0, 1000, 0, 0, 0);
+	for (int i = maxline-defaultline; i < txt.size() && i< maxline; i++) {
 		outtextxy(pos.x, pos.y, txt[i].c_str());
 		pos.y += 40;
 	}
+}
+void Text::SetLine(int n) {
+	maxline = n;
+	defaultline = n;
+}
+void Text::NextLine() {
+	if (maxline < txt.size())
+		maxline++;
+}
+void Text::PreLine() {
+	if (maxline > defaultline)
+		maxline--;
 }
