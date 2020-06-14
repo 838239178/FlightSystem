@@ -46,6 +46,7 @@ IMAGE background;
 Button btn[8];
 Button Exit;
 Button Login;
+Button Auto;
 Dialog Log;
 Text Result;
 string UserName;
@@ -58,6 +59,7 @@ void btn3_Click(Button& sender, MOUSEMSG m);
 void btn4_Click(Button& sender, MOUSEMSG m);
 void btn5_Click(Button& sender, MOUSEMSG m);
 void btn6_Click(Button& sender, MOUSEMSG m);
+void auto_Click(Button& sender, MOUSEMSG m);
 void login_Click(Button& sender, MOUSEMSG m);
 void exit_Click(Button& sender, MOUSEMSG m);
 void showdialog(Ve2 p,string title, string label, int time = 1000);
@@ -81,13 +83,14 @@ void OnLoad()
 	"保存",//4
 	"加载",//5
 	"清除",//6
-	"加载最近一次", //7
 	};
 	Login.label = "登录";
 	Login.SetImage("btn.png");
 	Exit.label = "退出";
 	Exit.SetImage("btn.png");
-	for (int i = 0; i < 8; i++) {
+	Auto.label = "最近记录";
+	Auto.SetImage("btn.png");
+	for (int i = 0; i < 7; i++) {
 		btn[i].label = s[i];
 		btn[i].SetImage("btn.png");
 	}
@@ -100,6 +103,7 @@ void OnLoad()
 	btn[6].Click = btn6_Click;
 	Login.Click = login_Click;
 	Exit.Click = exit_Click;
+	Auto.Click = auto_Click;
 	//
 	Log.SetImage("dialog.png");
 }
@@ -119,6 +123,7 @@ void Control()
 			}
 			if (Login.Click) Login.Click(Login,m);
 			if (Exit.Click) Exit.Click(Exit, m);
+			if (Auto.Click) Auto.Click(Auto, m);
 		}
 	}	
 	FlushMouseMsgBuffer();
@@ -143,6 +148,7 @@ void ShowMenu()
 	outtextxy(600, 60, v.c_str());
 	
 	for (; p.y < 595; p.y += 80, cnt++) btn[cnt].Show(p);
+	Auto.Show(Ve2{ 600,p.y - 240 });
 	Login.Show(Ve2{ 600, p.y-160 });
 	Exit.Show(Ve2{ 600, p.y - 80 });
 }
@@ -442,6 +448,18 @@ void exit_Click(Button& sender, MOUSEMSG m)
 	if (m.x > s.x&& m.y > s.y
 		&& m.x < e.x && m.y < e.y) {
 		Tag = EXIT;
+	}
+}
+void auto_Click(Button& sender, MOUSEMSG m)
+{
+	Ve2 s = sender.p;
+	Ve2 e = sender.p + sender.size;
+	if (m.x > s.x&& m.y > s.y
+		&& m.x < e.x && m.y < e.y) {
+		if(SysManager.AutoLoad())
+			showdialog(Ve2{ 300,200 }, "提示:", "加载成功");
+		else 
+			showdialog(Ve2{ 300,200 }, "提示:", "加载失败，没有最近一次的记录", 1200);
 	}
 }
 int main()

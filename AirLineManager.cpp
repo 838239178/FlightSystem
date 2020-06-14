@@ -12,6 +12,7 @@ using namespace std;
 #include "DataStructure.h"
 #include "AirLineManager.h"
 
+//输入航班号、飞机号、飞行日期、起点、终点来添加一条航班
 void AirLineManager::Add(string linecode, int planenum, int date, string start, string endd, int remain)
 {
 	AVLPTR key = new AirLineAVLNode;
@@ -24,6 +25,7 @@ void AirLineManager::Add(string linecode, int planenum, int date, string start, 
 	AirLineData.Insert(key, AirLineData.root);
 	StationData.Insert(start, endd, key);
 }
+//按航班号删除，成功返回true
 bool AirLineManager::Remove(string linecode)
 {
 	AVLTree T = AirLineData.FindByCode(linecode, AirLineData.root);
@@ -32,16 +34,19 @@ bool AirLineManager::Remove(string linecode)
 	AirLineData.Delete(linecode, AirLineData.root);
 	return true;
 }
+//按截止日期删除
 void AirLineManager::Remove(int date)
 {
 	AirLineData.ClearByDate(date);
 }
+//输入起点、终点，返回存有所有结果的vector
 const vector<AVLPTR> AirLineManager::SearchByStation(string start, string endd)
 {
 	vector<AVLPTR> ptrs;
 	StationData.Find(start, endd, ptrs);
 	return ptrs;
 }
+//输入航班号、人名、票数，返回航班信息指针（只读）
 const AVLPTR AirLineManager::AddCustomer(string linecode, string name, int& num)
 {
 	AVLPTR t = AirLineData.FindByCode(linecode, AirLineData.root);
@@ -57,6 +62,7 @@ const AVLPTR AirLineManager::AddCustomer(string linecode, string name, int& num)
 		num = -1;
 	return t;
 }
+//私有-直接添加客户
 void AirLineManager::AddCustomer(AVLPTR T, Customer B)
 {
 	AVLPTR t = T;
@@ -68,11 +74,13 @@ void AirLineManager::AddCustomer(AVLPTR T, Customer B)
 		SaveBookResult(T, B.Name);
 	}
 }
+//输入航班信息的指针、人名、票数
 void AirLineManager::AddBackup(AVLPTR T, string name, int num)
 {
 	STATIONNODEPTR s = T->node;
 	s->WatingQueue.push(Customer{ name,T->Code,num,-1 });
 }
+//输入航班号、客户名字，成功返回true
 bool AirLineManager::RemoveCustomer(string linecode, string name)
 {
 	AVLPTR T = AirLineData.FindByCode(linecode, AirLineData.root);
@@ -95,9 +103,10 @@ bool AirLineManager::RemoveCustomer(string linecode, string name)
 	else
 		return false;
 }
+//输入日期
 void AirLineManager::Save(int date)
 {
-	char s1[25];;
+	char s1[25];
 	sprintf(s1, "%d", date);
 	this->Version = s1;
 	strcat(s1, "AirLine.txt");
@@ -110,6 +119,7 @@ void AirLineManager::Save(int date)
 	FILE* F1 = fopen(s1, "w");
 	FILE* F2 = fopen(s2, "w");
 	FILE* F3 = fopen(s3, "w");
+	FILE* F4 = fopen("resent.txt", "w");
 	stack<AVLPTR> s;
 	AVLPTR T = AirLineData.root;
 	while (!s.empty() || T) {
@@ -143,10 +153,13 @@ void AirLineManager::Save(int date)
 			T = T->Right;
 		}
 	}
+	fprintf(F4, "%d\n", date);
 	fclose(F1);
 	fclose(F2);
 	fclose(F3);
+	fclose(F4);
 }
+//输入日期
 bool AirLineManager::Load(string date)
 {
 	this->Version = date;
@@ -172,7 +185,7 @@ bool AirLineManager::Load(string date)
 	while (1) {
 		flag = fscanf(F2, "%s %d %s %d", e[0], &i[0], e[1], &i[1]);
 		if (flag == -1) break;
-		a = e[0];
+		a = e[0]; 
 		b = e[1];
 		AVLPTR T = AirLineData.FindByCode(a, AirLineData.root);
 		T->node->CustomerList.push_back(Customer{ b,a,i[1],i[0] });
@@ -189,12 +202,29 @@ bool AirLineManager::Load(string date)
 	fclose(F3);
 	return true;
 }
+//读取最近的保存记录
+bool AirLineManager::AutoLoad() 
+{
+	FILE* F = fopen("resent.txt", "r");
+	int date = 0;
+	int flag = fscanf(F, "%d", &date);
+	if (flag == -1) return false;
+	char s[10] = { '\0' };
+	itoa(date, s, 10);
+	Load(s);
+	return true;
+}
+//私有-保存订单
 void AirLineManager::SaveBookResult(const AVLPTR data, string name)
 {
 	FILE* F = fopen("BookRecord.txt", "a");
-	fprintf(F, "%s\t%s\t%s\t%d\t%s\t%s\t%d\n", Version.c_str(), name, data->Code.c_str(), data->PlaneNo, data->StartName.c_str(), data->EndName.c_str(), data->FlightDate);
+	fprintf(F, "%s\t%s\t%s\t%d\t%s\t%s\t%d\n", Version.c_str(), name.c_str(), data->Code.c_str(), data->PlaneNo, data->StartName.c_str(), data->EndName.c_str(), data->FlightDate);
 	fclose(F);
 }
+/*
+私有-寻找合适的替补。输入名单所在站点迭代器、限制票数，返回该客户的信息结构体
+没有符合结果则返回的结构体中票数为-1
+*/
 Customer AirLineManager::FindBackUp(STATIONNODEPTR node, int tickets)
 {
 	Customer res("", "", -1, 0);
@@ -212,7 +242,6 @@ Customer AirLineManager::FindBackUp(STATIONNODEPTR node, int tickets)
 		node->WatingQueue.pop();		
 		if (temp.TicketsNum <= tickets) {
 			res = temp;
-			tickets = -1;
 		}
 		else
 			node->WatingQueue.push(temp);

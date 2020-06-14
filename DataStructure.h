@@ -50,17 +50,18 @@ typedef struct StationHead
 }StationHead;
 typedef list<StationNode>::iterator STATIONNODEPTR;
 typedef list<StationHead>::iterator STATIONHEADPTR;
+
 /*邻接表类*/
 class StationTable
 {
 public:
 	list<StationHead> headlist;
 
-    AVLPTR Find(string start, string end);
-    bool Find(string start, string end, vector<AVLPTR>& ptrs);
-	void Insert(string start, string end, AVLPTR data);
-	bool Remove(string start, string end);
-	bool Remove(STATIONHEADPTR start, STATIONNODEPTR end);
+    AVLPTR Find(string start, string end);                                              //按站点查找返回第一个相关数据
+    bool Find(string start, string end, vector<AVLPTR>& ptrs);                          //按站点查找返回所有相关数据
+	void Insert(string start, string end, AVLPTR data);                                 //插入一条索引
+	bool Remove(string start, string end);                                              //查找并删除一条索引
+	bool Remove(STATIONHEADPTR start, STATIONNODEPTR end);                              //直接删除索引
 };
 /*AVL结点*/
 typedef struct AirLineAVLNode
@@ -91,17 +92,17 @@ public:
     AirLineAVLNode* root;
 
     AirLineAVLTree() { root = NULL; }
-    int GetHeight(AVLTree A);
-    AVLTree FindMax(AVLTree T);
-    AVLTree FindMin(AVLTree T);
-    AVLTree LeftRotation(AVLTree T);
-    AVLTree RightRotation(AVLTree T);
-    AVLTree LeftRightRotation(AVLTree T);
-    AVLTree RightLeftRotation(AVLTree T);
-    AVLTree Insert(AVLTree Key, AVLTree& T);
-    AVLTree Delete(string Key, AVLTree T);
-    AVLTree FindByCode(string key, AVLTree T);
-    void ClearByDate(int date);
+    int GetHeight(AVLTree A);                                                   //获取高度
+    AVLTree FindMaxParent(AVLTree T);                                           //获取最右边结点的父节点
+    AVLTree FindMinParent(AVLTree T);                                           //获取最左边结点的父节点
+    AVLTree LeftRotation(AVLTree T);                                            //左旋
+    AVLTree RightRotation(AVLTree T);                                           //右旋
+    AVLTree LeftRightRotation(AVLTree T);                                       //左右旋
+    AVLTree RightLeftRotation(AVLTree T);                                       //右左旋
+    AVLTree Insert(AVLTree Key, AVLTree& T);                                    //插入
+    AVLTree Delete(string Key, AVLTree T);                                      //删除
+    AVLTree FindByCode(string key, AVLTree T);                                  //查找
+    void ClearByDate(int date);                                                 //清除
 private:
-    void GetPTR(AVLTree T, int date, vector<AVLPTR>& code);
+    void Deliver(AVLTree a, AVLTree b);                                         //把a赋值给b
 };

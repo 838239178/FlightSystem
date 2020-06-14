@@ -26,9 +26,13 @@ void Button::Show(Ve2 pos)
 	int w = ground.getwidth();
 	int h = ground.getheight();
 	settextcolor(BLACK);
-	settextstyle(24, 0, "黑体",0,0,100,0,0,0);
+	settextstyle(24, 12, "黑体",0,0,100,0,0,0);
 	putimage(pos.x, pos.y, &ground);
-	outtextxy(pos.x+w/3, pos.y+h/3, label.c_str());
+	//根据字符串长度，居中输出
+	Ve2 temp;
+	temp.x = (w - label.length() * 12) / 2;
+	temp.y = (h - 24) / 2;
+	outtextxy(pos.x+temp.x, pos.y+temp.y, label.c_str());
 }
 void Button::Select(MOUSEMSG m)
 {
@@ -64,7 +68,17 @@ void Dialog::Show(Ve2 pos)
 	settextstyle(24, 0, "黑体", 0, 0, 100, 0, 0, 0);
 	putimage(pos.x, pos.y, &ground);
 	outtextxy(pos.x+w/15, pos.y+h/15, title.c_str());
-	outtextxy(pos.x+w/15, pos.y+h/3, label.c_str()); 
+	string temp;
+	int i = 0;
+	//分割字符串输出
+	do {
+		if (i < label.length())
+			temp = label.substr(i, 22);
+		else
+			temp = "";
+		i += 22;
+		outtextxy(pos.x+w/15, pos.y+h/3+i, temp.c_str());
+	} while (temp.length());
 }
 void Dialog::Select(MOUSEMSG m)
 {
