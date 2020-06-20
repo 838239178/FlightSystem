@@ -93,6 +93,7 @@ void Dialog::Select(MOUSEMSG m)
 	}
 }
 //Text
+//重置文本域的内容
 void Text::Reset()
 {
 	txt.clear();
@@ -109,6 +110,7 @@ void Text::Show(Ve2 pos)
 		pos.y += 40;
 	}
 }
+//设置文本域最大显示行数
 void Text::SetLine(int n) {
 	maxline = n;
 	defaultline = n;

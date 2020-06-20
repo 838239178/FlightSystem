@@ -51,7 +51,7 @@ public:
 	}	
 	void operator += (const string& s) { 
 		txt.push_back(s); 
-		size.y = txt.size() * 64;
-		size.x = max(size.x,s.length() * 12);
+		size.y = txt.size() * 64;					//一行占64像素
+		size.x = max(size.x,s.length() * 12);		//默认单字体宽度是12像素
 	}
 };

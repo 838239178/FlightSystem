@@ -50,8 +50,8 @@ Button Auto;
 Dialog Log;
 Text Result(6);
 string UserName;
-int Tag;
-
+int Tag;									//用于判断是否绘制特定窗口或结束绘制的标志
+/*UI互动事件*/
 void btn0_Click(Button& sender, MOUSEMSG m);
 void btn1_Click(Button& sender, MOUSEMSG m);
 void btn2_Click(Button& sender, MOUSEMSG m);
@@ -63,6 +63,7 @@ void auto_Click(Button& sender, MOUSEMSG m);
 void login_Click(Button& sender, MOUSEMSG m);
 void exit_Click(Button& sender, MOUSEMSG m);
 void result_Scroll(Text& sender, MOUSEMSG m);
+/*对话框延时绘制*/
 void showdialog(Ve2 p,string title, string label, int time = 1000);
 
 void OnLoad()
@@ -151,7 +152,7 @@ void ShowMenu()
 	outtextxy(600, 40, v.c_str());	
 	v = "当前使用者:" + UserName;
 	outtextxy(600, 60, v.c_str());
-	
+	//show button
 	for (; p.y < 595; p.y += 80, cnt++) btn[cnt].Show(p);
 	Auto.Show(Ve2{ 600,p.y - 240 });
 	Login.Show(Ve2{ 600, p.y-160 });
@@ -286,7 +287,7 @@ bool Clear()
 	if (SysManager.GetVersion() == "not loaded") return false;
 	int date;
 	char s[10] = { '\0' };
-	InputBox(s, 10, "年月日(EX:20200605)", "请输入日期:",0,100,100);
+	InputBox(s, 10, "年月日(EX:20200605)", "请输入截止日期:",0,100,100);
 	if (s[0] == '\0')
 		return false;
 	sscanf(s, "%d", &date);
