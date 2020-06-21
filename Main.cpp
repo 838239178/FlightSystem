@@ -176,14 +176,10 @@ bool BookTicket()
 	const AVLPTR T = SysManager.AddCustomer(linecode, UserName, n);
 	if (T && n > 0) {
 		Result += "订票成功，您的航班为：";
-		itoa(n, s, 10);
-		string seat = "    座位号：";
-		char t[10];
-		itoa(n - temp + 1, t, 10);
-		seat += t;
+		string seat = "    座位号：" + to_string(n-temp+1);
 		if (temp > 1) {
 			seat += "—";
-			seat += s;
+			seat += to_string(n);
 		}
 		Result += T->Code + seat;
 		return true;
