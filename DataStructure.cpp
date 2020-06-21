@@ -99,8 +99,9 @@ bool StationTable::Remove(STATIONHEADPTR start, STATIONNODEPTR end)
     return true;
 }
 
-/*AVL树*/
-void AirLineAVLTree::Deliver(AVLTree a, AVLTree b)
+/*AVL树*/ 
+//把a的值赋给b
+void AirLineAVLTree::Deliver(AVLTree a, AVLTree b)             
 {
     //把a对应的站点的指针指向b
     a->node->AirLineData = b;
@@ -120,6 +121,7 @@ int AirLineAVLTree::GetHeight(AVLTree A) {
         return 0;
     return A->Height;
 }
+//返回子树最大结点的父节点，需要注意的是无子节点时返回它本身
 AVLTree  AirLineAVLTree::FindMaxParent(AVLTree T)
 {
     while (T && T->Right && T->Right->Right)
@@ -128,6 +130,7 @@ AVLTree  AirLineAVLTree::FindMaxParent(AVLTree T)
     }
     return T;
 }
+//返回子树最小结点的父节点，需要注意的是无子节点时返回它本身
 AVLTree  AirLineAVLTree::FindMinParent(AVLTree T)
 {
     while (T && T->Left && T->Left->Left)
@@ -166,10 +169,12 @@ AVLTree  AirLineAVLTree::RightLeftRotation(AVLTree T)
         T->Right = RightRotation(T->Right);
     return LeftRotation(T);
 }
+//将传入指针所指的数据插入到树中,指针不能为空
 AVLTree  AirLineAVLTree::Insert(AVLTree Key, AVLTree& T)
 {
     if (!T) {
         T = Key;
+        if (!T) return NULL;
         T->Height = 1;
         T->Left = T->Right = NULL;
         return T;

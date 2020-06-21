@@ -106,19 +106,15 @@ bool AirLineManager::RemoveCustomer(string linecode, string name)
 //ÊäÈëÈÕÆÚ
 void AirLineManager::Save(int date)
 {
-	char s1[25];
-	sprintf(s1, "%d", date);
-	this->Version = s1;
-	strcat(s1, "AirLine.txt");
-	char s2[25];
-	sprintf(s2, "%d", date);
-	strcat(s2, "Customer.txt");
-	char s3[25];
-	sprintf(s3, "%d", date);
-	strcat(s3, "Backup.txt");
-	FILE* F1 = fopen(s1, "w");
-	FILE* F2 = fopen(s2, "w");
-	FILE* F3 = fopen(s3, "w");
+	const string DT = to_string(date);
+	string s1, s2, s3;
+	this->Version = DT;
+	s1 = PATH + DT + "AirLine.txt";
+	s2 = PATH + DT + "Customer.txt";
+	s3 = PATH + DT + "Backup.txt";
+	FILE* F1 = fopen(s1.c_str(), "w");
+	FILE* F2 = fopen(s2.c_str(), "w");
+	FILE* F3 = fopen(s3.c_str(), "w");
 	FILE* F4 = fopen("resent.txt", "w");
 	stack<AVLPTR> s;
 	AVLPTR T = AirLineData.root;
@@ -163,9 +159,9 @@ void AirLineManager::Save(int date)
 bool AirLineManager::Load(string date)
 {
 	this->Version = date;
-	string s1 = date + "AirLine.txt";
-	string s2 = date + "Customer.txt";
-	string s3 = date + "Backup.txt";
+	string s1 = PATH + date + "AirLine.txt";
+	string s2 = PATH + date + "Customer.txt";
+	string s3 = PATH + date + "Backup.txt";
 	FILE* F1 = fopen(s1.c_str(), "r");
 	FILE* F2 = fopen(s2.c_str(), "r");
 	FILE* F3 = fopen(s3.c_str(), "r");
@@ -209,8 +205,7 @@ bool AirLineManager::AutoLoad()
 	int date = 0;
 	int flag = fscanf(F, "%d", &date);
 	if (flag == -1) return false;
-	char s[10] = { '\0' };
-	itoa(date, s, 10);
+	string s = to_string(date);
 	Load(s);
 	return true;
 }

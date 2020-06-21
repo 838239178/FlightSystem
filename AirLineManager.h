@@ -1,6 +1,9 @@
 #pragma once
 #define MAXTICKET 50
 /*º½¿Õ¶©Æ±ÏµÍ³¿ØÖÆÆ÷*/
+
+const string PATH = "DATA\\";
+
 class AirLineManager
 {
 private:
