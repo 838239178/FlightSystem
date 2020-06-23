@@ -98,6 +98,10 @@ bool StationTable::Remove(STATIONHEADPTR start, STATIONNODEPTR end)
     start->edge.erase(end);
     return true;
 }
+void StationTable::Clear() 
+{
+    headlist.clear();
+}
 
 /*AVL树*/ 
 //把a的值赋给b
@@ -250,6 +254,7 @@ AVLTree AirLineAVLTree::Delete(string Key, AVLTree T)
         }
         return T;
     }
+    return T;
 }
 AVLTree  AirLineAVLTree::FindByCode(string key, AVLTree T)
 {
@@ -264,7 +269,7 @@ AVLTree  AirLineAVLTree::FindByCode(string key, AVLTree T)
     }
     return NULL;
 }
-void  AirLineAVLTree::ClearByDate(int date)
+bool  AirLineAVLTree::ClearByDate(int date)
 {
     stack<AVLPTR> s;
     AVLPTR T = root;
@@ -285,14 +290,18 @@ void  AirLineAVLTree::ClearByDate(int date)
             }
             else {
                 if (T->FlightDate < date) {
+                    /*删除邻接表结点*/
                     auto head = T->head;
                     auto node = T->node;
                     head->edge.erase(node);
+                    /*删除树中结点*/
                     root = Delete(T->Code, root);
+                    return true;
                 }
                 s.pop();
                 T = NULL;
             }
         }
     }
+    return false;
 }

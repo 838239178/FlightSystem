@@ -13,6 +13,7 @@ private:
 	void SaveBookResult(const AVLPTR data, string name);													//保存订单记录
 	Customer FindBackUp(STATIONNODEPTR node, int tickets);													//寻找候补成员
 	void AddCustomer(AVLPTR T, Customer B);																	//直接添加客户
+	void ClearAllData();																					//清空内存中所有数据
 public:
 	bool Add(string linecode, int planenum, int date, string start, string end, int remain = MAXTICKET);	//添加一条航班
 	bool Remove(string linecode);																			//按航班号删除

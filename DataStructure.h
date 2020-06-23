@@ -62,6 +62,7 @@ public:
 	void Insert(string start, string end, AVLPTR data);                                 //插入一条索引
 	bool Remove(string start, string end);                                              //查找并删除一条索引
 	bool Remove(STATIONHEADPTR start, STATIONNODEPTR end);                              //直接删除索引
+    void Clear();                                                                       //清空所有数据
 };
 /*AVL结点*/
 typedef struct AirLineAVLNode
@@ -100,9 +101,9 @@ public:
     AVLTree LeftRightRotation(AVLTree T);                                       //左右旋
     AVLTree RightLeftRotation(AVLTree T);                                       //右左旋
     AVLTree Insert(AVLTree Key, AVLTree& T);                                    //插入
-    AVLTree Delete(string Key, AVLTree T);                                      //删除
+    AVLTree Delete(string Key, AVLTree T);                                     //删除
     AVLTree FindByCode(string key, AVLTree T);                                  //查找
-    void ClearByDate(int date);                                                 //清除
+    bool ClearByDate(int date);                                                 //清除
 private:
     void Deliver(AVLTree a, AVLTree b);                                         //把a赋值给b
 };

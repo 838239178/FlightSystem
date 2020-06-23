@@ -1,4 +1,4 @@
-﻿/*line: 1183*/
+﻿/*line: 1385*/
 #include <iostream>
 #include <string>
 #include <vector>
@@ -71,7 +71,7 @@ void OnLoad()
 	initgraph(800, 600);
 	setbkmode(TRANSPARENT);
 	Tag = NORMAL;
-	UserName = "none";
+	UserName = "administrator";
 	CLOCK.GetTime();
 	BeginBatchDraw();
 	//

@@ -41,7 +41,8 @@ bool AirLineManager::Remove(string linecode)
 //按截止日期删除
 void AirLineManager::Remove(int date)
 {
-	AirLineData.ClearByDate(date);
+	//每次从头开始删除，直到找不到为止
+	while (AirLineData.ClearByDate(date));
 }
 //输入起点、终点，返回存有所有结果的vector
 const vector<AVLPTR> AirLineManager::SearchByStation(string start, string endd)
@@ -162,6 +163,8 @@ void AirLineManager::Save(int date)
 //输入日期
 bool AirLineManager::Load(string date)
 {
+	if (this->Version != "") 
+		ClearAllData();
 	this->Version = date;
 	string s1 = PATH + date + "AirLine.txt";
 	string s2 = PATH + date + "Customer.txt";
@@ -175,6 +178,7 @@ bool AirLineManager::Load(string date)
 	string a, b;
 	if (!(F1 && F2 && F3)) return false;
 	while (1) {
+		/*航班号-飞机号-日期-起点-终点-余票*/
 		flag = fscanf(F1, "%s %d %d %s %s %d", e[0], &i[0], &i[1], e[1], e[2], &i[2]);
 		if (flag == -1) break;
 		a = e[1];
@@ -250,4 +254,10 @@ Customer AirLineManager::FindBackUp(STATIONNODEPTR node, int tickets)
 			break;
 	}
 	return res;
+}
+/*私有-清空所有数据*/
+void AirLineManager::ClearAllData()
+{
+	AirLineData.ClearByDate(99999999);
+	StationData.Clear();
 }
