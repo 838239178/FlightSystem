@@ -13,8 +13,11 @@ using namespace std;
 #include "AirLineManager.h"
 
 //输入航班号、飞机号、飞行日期、起点、终点来添加一条航班
-void AirLineManager::Add(string linecode, int planenum, int date, string start, string endd, int remain)
+bool AirLineManager::Add(string linecode, int planenum, int date, string start, string endd, int remain)
 {
+	/*航班号重复则插入失败*/
+	if (AirLineData.FindByCode(linecode, AirLineData.root))
+		return false;
 	AVLPTR key = new AirLineAVLNode;
 	key->Code = linecode;
 	key->StartName = start;
@@ -24,6 +27,7 @@ void AirLineManager::Add(string linecode, int planenum, int date, string start, 
 	key->PlaneNo = planenum;
 	AirLineData.Insert(key, AirLineData.root);
 	StationData.Insert(start, endd, key);
+	return true;
 }
 //按航班号删除，成功返回true
 bool AirLineManager::Remove(string linecode)
@@ -212,8 +216,10 @@ bool AirLineManager::AutoLoad()
 //私有-保存订单
 void AirLineManager::SaveBookResult(const AVLPTR data, string name)
 {
-	FILE* F = fopen("BookRecord.txt", "a");
-	fprintf(F, "%s\t%s\t%s\t%d\t%s\t%s\t%d\n", Version.c_str(), name.c_str(), data->Code.c_str(), data->PlaneNo, data->StartName.c_str(), data->EndName.c_str(), data->FlightDate);
+	FILE* F = fopen("DATA\\BookRecord.txt", "a");
+	/*订单日期-客户名字-航班号-飞机号-起点-终点-飞行日期*/
+	fprintf(F, "%s %-20s\t%s %-4d %-4s %-4s\t%d\n", Version.c_str(), name.c_str(), data->Code.c_str(),
+		data->PlaneNo, data->StartName.c_str(), data->EndName.c_str(), data->FlightDate);
 	fclose(F);
 }
 /*

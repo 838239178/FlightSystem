@@ -225,7 +225,7 @@ bool Search()
 	if (SysManager.GetVersion() == "not loaded") return false;
 	Result.Reset();	
 	Result.p = Ve2{ 240,90 };
-	Result += "航班号    飞机号  起飞时间    余票";
+	Result += "航班号    飞机号    起飞时间    余票";
 	string start, endd;
 	char input[100];
 	InputBox(input, 100, "起点  终点", "按格式输入位置信息:");
@@ -241,28 +241,43 @@ bool Search()
 		itoa(msg[i]->PlaneNo, is, 10);
 		itoa(msg[i]->FlightDate, ie, 10);
 		itoa(msg[i]->RemainTickets, ir, 10);
-		Result += msg[i]->Code + "        " + is + "    " + ie + "     " + ir;
+		Result += msg[i]->Code + "     " + is + "      " + ie + "     " + ir;
 	}
 	return true;
 }
-bool Write()
+int Write()
 {
-	if (SysManager.GetVersion() == "not loaded") return false;
+	if (SysManager.GetVersion() == "not loaded") return 0;
 	char input[100] = { '\0' };
-	InputBox(input, 100,  "航班号  飞机号  日期  起点  终点", "按格式输入航班信息:");
-	if (input[0] == '\0')
-		return false;
-	string linecode, start, endd;
-	char c[10];
-	char s[25];
-	char e[25];
-	int num, date;
-	sscanf(input, "%s %d %d %s %s", c, &num, &date, s, e);
-	linecode = c;
-	start = s;
-	endd = e;
-	SysManager.Add(linecode, num, date, start, endd);
-	return true;
+	string pPrompt = "航班号  飞机号  日期  起点  终点";
+	int flag = 1;		//返回值，判断是否为直接退出
+	while (InputBox(input, 100, pPrompt.c_str(), "按格式输入航班信息:", 0, 0, 0, false)) {
+		if (input[0] == '\0') {
+			pPrompt = "输入为空,请重新输入";
+			continue;
+		}
+		else
+			pPrompt = "航班号  飞机号  日期  起点  终点";
+		string linecode, start, endd;
+		char c[10] = { '\0' };
+		char s[25] = { '\0' };
+		char e[25] = { '\0' };
+		int num, date;
+		sscanf(input, "%s %d %d %s %s", c, &num, &date, s, e);
+		linecode = c;
+		start = s;
+		endd = e;
+		if (linecode.empty() || start.empty() || endd.empty()) {
+			pPrompt = "输入错误，重新输入";
+			continue;
+		}
+		if (!SysManager.Add(linecode, num, date, start, endd)) {
+			pPrompt = "航班号重复，请重新输入";
+			continue;
+		}
+		flag = 2;
+	}
+	return flag;
 }
 void Save()
 {
@@ -293,7 +308,7 @@ bool Clear()
 bool LogIN()
 {
 	char input[15] = { '\0' };
-	InputBox(input, 15, "(EX:小王)", "请输入姓名:", 0, 100, 100);
+	InputBox(input, 15, "(EX:小王)", "请输入姓名:", 0, 100, 0);
 	if (input[0] == '\0')
 		return false;
 	UserName = input;
@@ -368,10 +383,10 @@ void btn4_Click(Button& sender, MOUSEMSG m)
 	Ve2 e = sender.p + sender.size;
 	if (m.x > s.x&& m.y > s.y
 		&& m.x < e.x && m.y < e.y) {
-		if (UserName != "administrator") {
-			showdialog(Ve2{ 300,200 }, "提示:", "无权限！");
-			return;
-		}
+		//if (UserName != "administrator") {
+		//	showdialog(Ve2{ 300,200 }, "提示:", "无权限！");
+		//	return;
+		//}
 		Save();
 		showdialog(Ve2{ 300,200 }, "提示:", "保存成功");
 		Tag = NORMAL;
@@ -388,8 +403,10 @@ void btn3_Click(Button& sender, MOUSEMSG m)
 			showdialog(Ve2{ 300,200 }, "提示:", "无权限！");
 			return;
 		}
-		if(Write())
-			showdialog(Ve2{ 300,200 }, "提示:", "录入成功");
+		int flag = 0;
+		if (flag = Write()) {
+			if(flag == 2) showdialog(Ve2{ 300,200 }, "提示:", "录入成功");
+		}
 		else {
 			string s;
 			if (SysManager.GetVersion() == "not loaded")

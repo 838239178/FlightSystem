@@ -14,7 +14,7 @@ private:
 	Customer FindBackUp(STATIONNODEPTR node, int tickets);													//寻找候补成员
 	void AddCustomer(AVLPTR T, Customer B);																	//直接添加客户
 public:
-	void Add(string linecode, int planenum, int date, string start, string end, int remain = MAXTICKET);	//添加一条航班
+	bool Add(string linecode, int planenum, int date, string start, string end, int remain = MAXTICKET);	//添加一条航班
 	bool Remove(string linecode);																			//按航班号删除
 	void Remove(int date);																					//按日期清除
 	const vector<AVLPTR> SearchByStation(string start, string end);											//按站点查找
