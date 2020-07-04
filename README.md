@@ -1,6 +1,6 @@
 # FlightSystem
  2020 数据结构 课设
-[TOC]
+ 应用了 AVL树 邻接表 队列 等数据结构
 ## 结构体（struct）
 ### AirLineAVLNode
 avl树的单位结构，储存了航班信息
